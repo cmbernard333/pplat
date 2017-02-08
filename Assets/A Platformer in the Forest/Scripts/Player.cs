@@ -8,32 +8,48 @@ public class Player : MonoBehaviour {
 	bool facingRight = true;
 
 	private Animator anim;
+	private Rigidbody2D rb2d;
 
 	// Use this for initialization
 	void Start () 
 	{
 		this.anim = GetComponent<Animator>();
+		this.rb2d = GetComponent<Rigidbody2D>();
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () 
 	{
-		// retrieve the horizontal acceds for moving from the Input (stick, joypad, etc)
-		float moveAccess = Input.GetAxis("Horizontal");
+		Jump();
+		Move();
+	}
 
-		this.anim.SetFloat("Speed",Mathf.Abs(moveAccess));
+	void Jump()
+	{
+		float moveVertical = Input.GetAxis("Vertical");
+
+		if (moveVertical > 0)
+			this.rb2d.AddForce(transform.up * maxSpeed);
+	}
+
+	void Move() 
+	{
+		// retrieve the horizontal acceds for moving from the Input (stick, joypad, etc)
+		float moveHorizontal = Input.GetAxis("Horizontal");
+
+		this.anim.SetFloat("Speed",Mathf.Abs(moveHorizontal));
 
 		// add a Vector2 force to rigid body by multipying the access by the max speed
-		GetComponent<Rigidbody2D>().AddForce(Vector2.right * (moveAccess * this.maxSpeed));
+		this.rb2d.AddForce(Vector2.right * (moveHorizontal * this.maxSpeed));
 
 		// If the input is moving the player right and the player is facing left...
-        if(moveAccess > 0 && !this.facingRight)
+        if(moveHorizontal > 0 && !this.facingRight)
 		{
             // ... flip the player.
             Flip();
 		}
         // Otherwise if the input is moving the player left and the player is facing right...
-        else if(moveAccess < 0 && this.facingRight)
+        else if(moveHorizontal < 0 && this.facingRight)
 		{
             // ... flip the player.
             Flip();
